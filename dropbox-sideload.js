@@ -1,6 +1,6 @@
 // Javascript
 jQuery(document).ready(function (){ 
-	var button = Dropbox.createChooseButton({
+	var db_options = {
 			// Required. Called when a user selects an item in the Chooser.
 			success: function(files) {
 				// each element in the files array is a file object, defined as
@@ -18,7 +18,9 @@ jQuery(document).ready(function (){
 					// If the user didn't select an image or video, no thumbnail will be included.
 					thumbnailLink: "https://...?bounding_box=75&mode=fit",
 				} */
-					alert("Here's the file link: " + files[0].link)
+					jQuery('#dropbox-file').val(files[0].link);
+					jQuery('#dropbox-form-submit').removeAttr('disabled');
+					//alert("Here's the file link: " + files[0].link)
 			},
 
 			// Optional. Called when the user closes the dialog without selecting a file
@@ -35,6 +37,9 @@ jQuery(document).ready(function (){
 			// file types, such as "video" or "images" in the list. For more information,
 			// see File types below. By default, all extensions are allowed.
 		}
-	);
-	document.getElementById("dropbox-sideload-form").appendChild(button);
+	
+	jQuery('#dropbox-choose').click(function(){
+		Dropbox.choose(db_options);
+	});
+	//document.getElementById("dropbox-sideload-form").appendChild(button);
 });
