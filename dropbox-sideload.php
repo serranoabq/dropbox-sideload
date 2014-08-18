@@ -22,7 +22,7 @@ function unclean_url( $good_protocol_url, $original_url, $_context){
 
 //Assign a name to the tab
 function dropbox_sideload_menu($tabs) {
-	$tabs['dropbox']='Dropbox Sideload';
+	$tabs['dropbox']='From Dropbox';
 	return $tabs;
 }
 
@@ -36,14 +36,39 @@ function dropbox_sideload_scripts() {
 
 function dropbox_sideload_form () {
 	global $pagenow;
-	media_upload_header();
-	dropbox_sideload_scripts();
 	$post_id = isset($_REQUEST['post_id']) ? intval($_REQUEST['post_id']) : 0;
 	$url = admin_url('media-upload.php?tab=dropbox');
 
 	if ( $post_id )
 		$url = add_query_arg('post_id', $post_id, $url);
+	if ( isset( $_REQUEST['dropbox-file']) ){
+		$dpurl = $_REQUEST['dropbox-file'];
+		$tmp = download_url( $dpurl );
+		$file_array = array(
+			'name' => basename( $dpurl ),
+			'tmp_name' => $tmp
+		);
 
+		// Check for download errors
+		if ( is_wp_error( $tmp ) ) {
+			@unlink( $file_array[ 'tmp_name' ] );
+			return $tmp;
+		}
+		$id = media_handle_sideload( $file_array, $post_id );
+		// Check for handle sideload errors.
+		if ( is_wp_error( $id ) ) {
+			@unlink( $file_array['tmp_name'] );
+			return $id;
+		}
+		$attachment_url = wp_get_attachment_url( $id );
+		echo '<script>jQuery(document).readd(function($){
+			parent.wp.media.editor.insert('.$attachment_url.');
+			return false;
+			</script>';
+	} else {
+		media_upload_header();
+		dropbox_sideload_scripts();
+	
 	?>
 	<div id="dropbox-sideload-form">
 		<form method="post" action="<?php echo $url; ?>">
@@ -60,6 +85,7 @@ function dropbox_sideload_form () {
 	</div> 	
 
 <?php }
+	}
 
 function dropbox_sideload_menu_handle() {
 	return wp_iframe('dropbox_sideload_form');
@@ -74,13 +100,7 @@ add_filter('media_upload_tabs', 'dropbox_sideload_menu');
 //Add menu handle to when the media upload action occurs
 add_action('media_upload_dropbox', 'dropbox_sideload_menu_handle');
 
-add_action( 'admin_init', 'handle_dropbox_sideload');
 function handle_dropbox_sideload(){
-	global $post;
-	echo '<!--';
-		var_dump($_REQUEST);
-		var_dump($_POST);
-	echo '-->';
 	/*
 	$url = ''; // Input a .zip URL here
 	$tmp = download_url( $url );
