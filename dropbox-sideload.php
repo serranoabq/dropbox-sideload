@@ -131,6 +131,15 @@ function unclean_url( $good_protocol_url, $original_url, $_context){
 	return $good_protocol_url;
 }
 
+<<<<<<< HEAD
+=======
+//Assign a name to the tab
+function dropbox_sideload_menu($tabs) {
+	$tabs['dropbox']='From Dropbox';
+	return $tabs;
+}
+
+>>>>>>> origin/master
 //Add scripts & styles
 function dropbox_sideload_add_styles() {	
 	if ( 'media_upload_server' == current_filter() )
@@ -144,13 +153,12 @@ function dropbox_sideload_add_styles() {
 /*
 function dropbox_sideload_form () {
 	global $pagenow;
-	media_upload_header();
-	dropbox_sideload_scripts();
 	$post_id = isset($_REQUEST['post_id']) ? intval($_REQUEST['post_id']) : 0;
 	$url = admin_url('media-upload.php?tab=dropbox');
 
 	if ( $post_id )
 		$url = add_query_arg('post_id', $post_id, $url);
+<<<<<<< HEAD
 	
 	if( isset( $_REQUEST['dropbox-file'] ) ){
 		$dpurl = $_REQUEST['dropbox-file']; // Input a .zip URL here
@@ -188,6 +196,35 @@ function dropbox_sideload_form () {
 		echo '</div>';
 		
 	} else {
+=======
+	if ( isset( $_REQUEST['dropbox-file']) ){
+		$dpurl = $_REQUEST['dropbox-file'];
+		$tmp = download_url( $dpurl );
+		$file_array = array(
+			'name' => basename( $dpurl ),
+			'tmp_name' => $tmp
+		);
+
+		// Check for download errors
+		if ( is_wp_error( $tmp ) ) {
+			@unlink( $file_array[ 'tmp_name' ] );
+			return $tmp;
+		}
+		$id = media_handle_sideload( $file_array, $post_id );
+		// Check for handle sideload errors.
+		if ( is_wp_error( $id ) ) {
+			@unlink( $file_array['tmp_name'] );
+			return $id;
+		}
+		$attachment_url = wp_get_attachment_url( $id );
+		echo '<script>jQuery(document).readd(function($){
+			parent.wp.media.editor.insert('.$attachment_url.');
+			return false;
+			</script>';
+	} else {
+		media_upload_header();
+		dropbox_sideload_scripts();
+>>>>>>> origin/master
 	
 	?>
 	<div id="dropbox-sideload-form">
@@ -206,7 +243,10 @@ function dropbox_sideload_form () {
 
 <?php }
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 
 
 //Needed script to make sure wordpress' media upload scripts are inplace
@@ -219,6 +259,23 @@ wp_enqueue_script('media-upload');
 add_action('media_upload_dropbox', 'dropbox_sideload_menu_handle');
 */
 
+<<<<<<< HEAD
+=======
+function handle_dropbox_sideload(){
+	/*
+	$url = ''; // Input a .zip URL here
+	$tmp = download_url( $url );
+	$file_array = array(
+			'name' => basename( $url ),
+			'tmp_name' => $tmp
+	);
+
+	// Check for download errors
+	if ( is_wp_error( $tmp ) ) {
+			@unlink( $file_array[ 'tmp_name' ] );
+			return $tmp;
+	}
+>>>>>>> origin/master
 
 
 ?>

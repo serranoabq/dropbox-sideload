@@ -40,6 +40,8 @@ jQuery(document).ready(function (){
 	
 	jQuery('#dropbox-choose').click(function(){
 		Dropbox.choose(db_options);
+		return false;
 	});
+	
 	//document.getElementById("dropbox-sideload-form").appendChild(button);
 });
