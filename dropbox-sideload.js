@@ -19,7 +19,10 @@ jQuery(document).ready(function (){
 					thumbnailLink: "https://...?bounding_box=75&mode=fit",
 				} */
 					jQuery('#dropbox-file').val(files[0].link);
-					jQuery('#dropbox-form-submit').removeAttr('disabled');
+					jQuery('#step2').attr('class','done');
+					jQuery('#step3').attr('class','done');
+					jQuery('#sideload').attr('disabled','false');
+					jQuery('#sideload').prop('value','Sideload');
 					//alert("Here's the file link: " + files[0].link)
 			},
 

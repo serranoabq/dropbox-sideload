@@ -9,21 +9,20 @@
 add_action('admin_init', 'dropbox_sideload_admin_init');
 function dropbox_sideload_admin_init(){
 	//Register our JS & CSS
-	wp_register_style ('dropboxjs', 'https://www.dropbox.com/static/api/2/dropins.js');
+	wp_register_script ('dropboxjs', 'https://www.dropbox.com/static/api/2/dropins.js');
 	wp_register_script('dropbox-sideload', plugins_url('dropbox-sideload.js', __FILE__), array('dropboxjs') );
 	wp_register_style('dropbox-sideload', plugins_url('dropbox-sideload.css', __FILE__));
-
 		
 	// NEEDS: dropbox_sideload_add_styles()
-	add_action('load-media_page_add-from-server', 'dropbox_sideload_add_styles') );
-	add_action('media_upload_server', 'dropbox_sideload_add_styles') );
+	add_action('load-media_page_dropbox-sideload', 'dropbox_sideload_add_styles');
+	add_action('media_upload_dropbox', 'dropbox_sideload_add_styles');
 
-	// DONE: Add a Dropbox Sideload tab to the medua uploader
+	// Add a Dropbox Sideload tab to the media uploader
 	// NEEDS: dropbox_sideload_menu()
 	add_filter('media_upload_tabs', 'dropbox_sideload_menu');
 	
 	// Add Dropbox Sideload tab handler
-	// NEEDS: dropbox_sideload_main_content()
+	// NEEDS: dropbox_sideload_tab_handler()
 	add_action('media_upload_dropbox',  'dropbox_sideload_tab_handler');
 	
 	register_setting('dropbox-sideload', 'dropbox-api');
@@ -59,7 +58,7 @@ function dropbox_sideload_tab_handler() {
 
 add_action('admin_menu', 'dropbox_sideload_admin_menu');
 function dropbox_sideload_admin_menu() {
-	// NEEDS: dropbox_sideload_menu_page
+	// NEEDS: dropbox_sideload_menu_page. 
 	if ( ! function_exists('submit_button') ) return;
 	
 	if ( current_user_can('upload_files') )
@@ -79,14 +78,21 @@ function dropbox_sideload_menu_page(){
 }
 
 function dropbox_sideload_main_content(){
+	// NEEDS: dropbox_sideload_handle_sideload()
 	global $pagenow;
 	$post_id = isset($_REQUEST['post_id']) ? intval($_REQUEST['post_id']) : 0;
 	$dropbox_api = get_option('dropbox-api');
+	
 	if (empty($dropbox_api)) {
-		if (isset(($_REQUEST['dropbox_api']))
-			$dropbox_api=$_REQUEST['dropbox_api'];
+		if (isset($_REQUEST['dropbox-api'])){
+			$dropbox_api=$_REQUEST['dropbox-api'];
 			update_option('dropbox-api',$dropbox_api);
+		} else {
+			$dropbox_api = '';
+		}
 	}
+	$step1 = !empty($dropbox_api);
+	$button = __('Next', 'dropbox-sideload');
 	
 	if ( 'upload.php' == $pagenow )
 		$url = admin_url('upload.php?page=dropbox-sideload');
@@ -96,23 +102,37 @@ function dropbox_sideload_main_content(){
 	if ( $post_id )
 		$url = add_query_arg('post_id', $post_id, $url);
 
+	if( isset( $_REQUEST['dropbox-file'] ) && $step1){
+		$attachment_url = dropbox_sideload_handle_sideload($_REQUEST['dropbox-file']);
+		$button = __('Sideload', 'dropbox-sideload');
+		if ($attachment_url){
+			$status = sprintf(__('Once you have selected files to be imported, go to the <a href="%s">Media Library tab</a> to add them to your post.', 'dropbox-sideload'), esc_url(admin_url('media-upload.php?type=image&tab=library&post_id=' . $post_id)) ) ;
+		}else{ 
+			$status = __('Error sideloading the file from Dropbox', 'dropbox-sideload');
+		}
+		$step4 = true;
+	}
 	?>
 	<div class="dropbox_sideload_wrap">
 	
 	<form method="post" action="<?php echo $url ?>">
 	<ol id="dropbox-sideload-steps">
-		<li id="step1">
-			Enter your Dropbox API key<br/>
-			<input type="text" name="dropbox-api" id="dropbox-api" value="<?php echo $dropbox_api; ?>"/>
-	<?php if ( 'media-upload.php' == $GLOBALS['pagenow'] && $post_id > 0 ) : ?>
-		<p><?php printf(__('Once you have selected files to be imported, go to the <a href="%s">Media Library tab</a> to add them to your post.', 'dropbox-sideload'), esc_url(admin_url('media-upload.php?type=image&tab=library&post_id=' . $post_id)) ); ?></p>
-  <?php endif; ?>
-	<?php if ( $post_id != 0 ) : ?>
-		<input type="checkbox" name="gallery" id="gallery-import" <?php checked( $import_to_gallery ); ?> /> <label for="gallery-import"><?php _e('Attach sideloaded files to this post', 'dropbox-sideload')?></label>
-		<br class="clear" />
-	<?php endif; ?>
+		<li id="step1" class="<?php echo $step1?'done':'required';?>">
+			Enter your Dropbox API key:<br/>
+			<input type="text" name="dropbox-api" id="dropbox-api" value="<?php echo $dropbox_api; ?>" <?php echo $step1?'readonly':'';?>/>
+		</li>
+		<li id="step2" class="<?php echo $step1?'required':'disabled';?>">
+			<a href="#" id="dropbox-choose">Choose from Dropbox</a>
+		</li>
+		<li id="step3" class="disabled">
+			<input type="text" name="dropbox-file" id="dropbox-file" readonly />
+		</li>
+		<li id="step4" class="<?php echo $step4?'done':'disabled'?>">
+			Status: <?php echo $status; ?>
+		</li>
+	</ol>
 	<br class="clear" />
-	<?php submit_button( __('Import', 'dropbox-sideload'), 'primary', 'import', false); ?>
+	<?php submit_button( $button, 'primary', 'sideload', false, array('disabled'?$step1)); ?>
 	</form>
 	</div>
 <?php
@@ -121,6 +141,7 @@ function dropbox_sideload_main_content(){
 // There's no easy way to add the id and app-key so hijack the clean_url filter
 add_filter('clean_url','unclean_url',10,3);
 function unclean_url( $good_protocol_url, $original_url, $_context){
+	
 	$dropbox_api = get_option('dropbox-api');
 	if (empty($dropbox_api)) return $original_url;
 	if (false !== strpos($original_url, 'dropbox.com')){
@@ -131,15 +152,6 @@ function unclean_url( $good_protocol_url, $original_url, $_context){
 	return $good_protocol_url;
 }
 
-<<<<<<< HEAD
-=======
-//Assign a name to the tab
-function dropbox_sideload_menu($tabs) {
-	$tabs['dropbox']='From Dropbox';
-	return $tabs;
-}
-
->>>>>>> origin/master
 //Add scripts & styles
 function dropbox_sideload_add_styles() {	
 	if ( 'media_upload_server' == current_filter() )
@@ -148,6 +160,33 @@ function dropbox_sideload_add_styles() {
 	wp_enqueue_script('dropboxjs' );
 	wp_enqueue_script('dropbox-sideload');
 	wp_enqueue_style('dropbox-sideload');
+}
+
+
+// Handle the sideloading. Returns attachment url
+function dropbox_sideload_handle_sideload($url){
+	
+	$tmp = download_url( $url );
+	$file_array = array(
+		'name' => basename( $url ),
+		'tmp_name' => $tmp
+	);
+	
+	// Check for download errors
+	if ( is_wp_error( $tmp ) ) {
+		@unlink( $file_array[ 'tmp_name' ] );
+		return false;
+	}
+	$id = media_handle_sideload( $file_array, 0);
+	
+	// Check for handle sideload errors.
+	if ( is_wp_error( $id ) ) {
+		@unlink( $file_array['tmp_name'] );
+		return false;
+	}
+	$attachment_url = wp_get_attachment_url( $id );
+		
+	return $attachment_url;
 }
 
 /*
@@ -243,39 +282,8 @@ function dropbox_sideload_form () {
 
 <?php }
 	}
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 
 
-//Needed script to make sure wordpress' media upload scripts are inplace
-wp_enqueue_script('media-upload');
 
-//Add tab to the media upload button
-
-
-//Add menu handle to when the media upload action occurs
-add_action('media_upload_dropbox', 'dropbox_sideload_menu_handle');
 */
-
-<<<<<<< HEAD
-=======
-function handle_dropbox_sideload(){
-	/*
-	$url = ''; // Input a .zip URL here
-	$tmp = download_url( $url );
-	$file_array = array(
-			'name' => basename( $url ),
-			'tmp_name' => $tmp
-	);
-
-	// Check for download errors
-	if ( is_wp_error( $tmp ) ) {
-			@unlink( $file_array[ 'tmp_name' ] );
-			return $tmp;
-	}
->>>>>>> origin/master
-
-
 ?>
