@@ -21,8 +21,8 @@ jQuery(document).ready(function (){
 					jQuery('#dropbox-file').val(files[0].link);
 					jQuery('#step2').attr('class','done');
 					jQuery('#step3').attr('class','done');
-					jQuery('#sideload').attr('disabled','false');
-					jQuery('#sideload').prop('value','Sideload');
+					jQuery('#dropbox-sideload-button').removeAttr('disabled');
+					jQuery('#dropbox-sideload-button').prop('value','Sideload');
 					//alert("Here's the file link: " + files[0].link)
 			},
 
@@ -45,6 +45,9 @@ jQuery(document).ready(function (){
 		Dropbox.choose(db_options);
 		return false;
 	});
-	
+	jQuery('#dropbox-api').on('input propertychange paste', function(){
+		jQuery('#dropbox-sideload-button').removeAttr('disabled');
+		return false;
+	});
 	//document.getElementById("dropbox-sideload-form").appendChild(button);
 });

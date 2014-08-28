@@ -9,23 +9,25 @@
 add_action('admin_init', 'dropbox_sideload_admin_init');
 function dropbox_sideload_admin_init(){
 	//Register our JS & CSS
-	wp_register_script ('dropboxjs', 'https://www.dropbox.com/static/api/2/dropins.js');
-	wp_register_script('dropbox-sideload', plugins_url('dropbox-sideload.js', __FILE__), array('dropboxjs') );
-	wp_register_style('dropbox-sideload', plugins_url('dropbox-sideload.css', __FILE__));
+	wp_register_script ( 'dropboxjs', 'https://www.dropbox.com/static/api/2/dropins.js' );
+	wp_register_script( 'dropbox-sideload', 
+		plugins_url( 'dropbox-sideload.js', __FILE__ ), array( 'dropboxjs' ) );
+	wp_register_style( 'dropbox-sideload', 
+		plugins_url('dropbox-sideload.css', __FILE__ ) );
 		
 	// NEEDS: dropbox_sideload_add_styles()
-	add_action('load-media_page_dropbox-sideload', 'dropbox_sideload_add_styles');
-	add_action('media_upload_dropbox', 'dropbox_sideload_add_styles');
+	add_action( 'load-media_page_dropbox-sideload', 'dropbox_sideload_add_styles' );
+	add_action( 'media_upload_dropbox', 'dropbox_sideload_add_styles' );
 
 	// Add a Dropbox Sideload tab to the media uploader
 	// NEEDS: dropbox_sideload_menu()
-	add_filter('media_upload_tabs', 'dropbox_sideload_menu');
+	add_filter( 'media_upload_tabs', 'dropbox_sideload_menu' );
 	
 	// Add Dropbox Sideload tab handler
 	// NEEDS: dropbox_sideload_tab_handler()
-	add_action('media_upload_dropbox',  'dropbox_sideload_tab_handler');
+	add_action( 'media_upload_dropbox',  'dropbox_sideload_tab_handler' );
 	
-	register_setting('dropbox-sideload', 'dropbox-api');
+	register_setting( 'dropbox-sideload', 'dropbox-api' );
 }
 
 // Assign a tab to the media uploader
@@ -84,7 +86,7 @@ function dropbox_sideload_main_content(){
 	$dropbox_api = get_option('dropbox-api');
 	
 	if (empty($dropbox_api)) {
-		if (isset($_REQUEST['dropbox-api'])){
+		if (isset($_REQUEST['dropbox-api']) && !empty($_REQUEST['dropbox-api'])){
 			$dropbox_api=$_REQUEST['dropbox-api'];
 			update_option('dropbox-api',$dropbox_api);
 		} else {
@@ -93,20 +95,24 @@ function dropbox_sideload_main_content(){
 	}
 	$step1 = !empty($dropbox_api);
 	$button = __('Next', 'dropbox-sideload');
+	$status = '';
 	
-	if ( 'upload.php' == $pagenow )
-		$url = admin_url('upload.php?page=dropbox-sideload');
-	else
-		$url = admin_url('media-upload.php?tab=dropbox');
-
+	if ( 'upload.php' == $pagenow ){
+		$url = admin_url( 'upload.php?page=dropbox-sideload' );
+		$library_url = admin_url( 'upload.php' );
+	} else { 
+		$url = admin_url('media-upload.php?tab=dropbox' );
+		$library_url = admin_url( 'media-upload.php?tab=library' );
+	}
 	if ( $post_id )
-		$url = add_query_arg('post_id', $post_id, $url);
+		$url = add_query_arg( 'post_id', $post_id, $url );
 
-	if( isset( $_REQUEST['dropbox-file'] ) && $step1){
-		$attachment_url = dropbox_sideload_handle_sideload($_REQUEST['dropbox-file']);
-		$button = __('Sideload', 'dropbox-sideload');
+	if( isset( $_REQUEST['dropbox-file'] ) && ! empty( $_REQUEST['dropbox-file'] ) && $step1){
+		$attachment_url = dropbox_sideload_handle_sideload( $_REQUEST['dropbox-file'] );
+		$button = __( 'Sideload', 'dropbox-sideload' );
+		
 		if ($attachment_url){
-			$status = sprintf(__('Once you have selected files to be imported, go to the <a href="%s">Media Library tab</a> to add them to your post.', 'dropbox-sideload'), esc_url(admin_url('media-upload.php?type=image&tab=library&post_id=' . $post_id)) ) ;
+			$status = sprintf(__('Once you have sideloaded the file, go to the <a href="%s">Media Library</a> to add it to your post.', 'dropbox-sideload'), $library_url) ;
 		}else{ 
 			$status = __('Error sideloading the file from Dropbox', 'dropbox-sideload');
 		}
@@ -114,7 +120,6 @@ function dropbox_sideload_main_content(){
 	}
 	?>
 	<div class="dropbox_sideload_wrap">
-	
 	<form method="post" action="<?php echo $url ?>">
 	<ol id="dropbox-sideload-steps">
 		<li id="step1" class="<?php echo $step1?'done':'required';?>">
@@ -132,7 +137,7 @@ function dropbox_sideload_main_content(){
 		</li>
 	</ol>
 	<br class="clear" />
-	<?php submit_button( $button, 'primary', 'sideload', false, array('disabled'?$step1)); ?>
+	<?php submit_button( $button, 'primary', 'dropbox-sideload-button', false, array('disabled'=>$step1)); ?>
 	</form>
 	</div>
 <?php
