@@ -1,9 +1,13 @@
 /*
     Plugin Name: Dropbox Sideloader
     Description: Plugin to enable sideloading media from Dropbox. 
-    Version: 0.75
+    Version: 0.8
     Author: Justin R. Serrano
 */
+
+.dropbox_sideload_wrap {
+	padding: 10px;
+}
 
 #dropbox-sideload-steps tr{
 	border-left: 4px solid #f0f0f0;
@@ -13,14 +17,7 @@
 	padding-left: 5px;
 }
 
-.step2 #table-step1,
-.step3 #table-step1,
-.step3 #table-step2a,
-.step3 #table-step2b,
-.step3 #table-step3 {
-	border-left: 4px solid lightgreen;
-}
-.step3.error #table-step3 {
+.error #status {
 	border-left: 4px solid red;
 }
 

@@ -1,7 +1,7 @@
 /*
     Plugin Name: Dropbox Sideloader
     Description: Plugin to enable sideloading media from Dropbox. 
-    Version: 0.75
+    Version: 0.8
     Author: Justin R. Serrano
 */
 // Javascript
@@ -19,9 +19,16 @@ jQuery(document).ready(function (){
 					// Add file to text box
 					jQuery('#dropbox-file').val(files[0].link);
 					jQuery('#dropbox-sideload-button').removeAttr('disabled');
-					
+					jQuery('#dropbox-filename').html( files[0].name);
+					$img = files[0].icon;
+					if ( files[0].thumbnailLink ) {
+						$img = files[0].thumbnailLink;
+					}
+					jQuery('#dropbox-thumb').html( '<img src="' + $img + '" />');
+					jQuery('#dropbox-status').html( 'Ready to sideload');
+						
 					// This is a little 'hackish', but it works at logging out the user
-					if( ! jQuery('#dropbox-stay-logged-in').prop('checked') )
+					if( jQuery('#dropbox-stay-logged-in').prop('value') == '0' )
 						jQuery.getScript('http://www.dropbox.com/logout');
 			},
 
@@ -35,8 +42,5 @@ jQuery(document).ready(function (){
 		return false;
 	});
 	
-	jQuery('#dropbox-api').on('input propertychange paste', function(){
-		jQuery('#dropbox-sideload-button').removeAttr('disabled');
-	});
-
+	
 });
