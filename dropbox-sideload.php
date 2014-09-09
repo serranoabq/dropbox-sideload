@@ -302,7 +302,7 @@ function dropbox_sideload_handle_sideload($url){
 	
 	// Check for download errors
 	if ( is_wp_error( $tmp ) ) {
-		error_log( $tmp -> get_error_message() );
+		error_log( "DROPBOX_SIDELOAD: " . $tmp -> get_error_message() );
 		@unlink( $file_array[ 'tmp_name' ] );
 		return false;
 	}
@@ -312,7 +312,7 @@ function dropbox_sideload_handle_sideload($url){
 	
 	// Check for handle sideload errors.
 	if ( is_wp_error( $id ) ) {
-		error_log( $id -> get_error_message() );
+		error_log( "DROPBOX_SIDELOAD: " . $id -> get_error_message() );
 		@unlink( $file_array['tmp_name'] );
 		return false;
 	}
