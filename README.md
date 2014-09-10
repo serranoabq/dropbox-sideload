@@ -34,15 +34,15 @@ Errors
 
 Sideloading depends heavily on the server capabilities. Some server configurations will not be able to sideload the requested file. This is not an issue of the plugin, but of the server environment. When an error occurs during sideloading, the user is notified. The error will also be logged to the error log, if enabled in the WordPress configuration. Some common types of errors include:
 * cURL is not properly installed or configured 
-* incorrect or insufficient PHP upload settings (i.e., file too big)
+* improper PHP upload settings (i.e., file too big)
 * script timeout during upload (i.e., file too big so it takes too long)
 * invalid or incorrect SSL certificates for cURL access (Dropbox file URL is an https URL)
 
 Notes
 -------
 
-1. The API key allows Dropbox Sideload to use the Dropbox Chooser Drop-in to select the file. This retreives the dowload URL of the selected file in the same way one can share the file directly from Dropbox. The API key DOES NOT provide access to any file within a Dropbox account other than the one selected by the user. 
-2. If a user is logged into the Dropbox site on the browser being used to access the WordPress site, that account will automatically be used. Depending on the browsing environment, this can be an undesired behavior. For this reason, Dropbox Sideload will log out the current Dropbox user after the selection is made. This way, another user on the same browser cannot access the files. If you would rather remain logged in, please change the appropriate setting.
+1. The API key allows Dropbox Sideload to use the Dropbox Chooser Drop-in to select the file. This retreives the download URL of the selected file in the same way one can share the file directly from Dropbox. The API key _DOES NOT_ provide access to any file within a Dropbox account other than the one selected by the user. 
+2. If a user is logged into the Dropbox site on the browser being used to access the WordPress site, that Dropbox account will automatically be used. Depending on the browsing environment, this can be a potential security issue with potential unauthorized access to Dropbox (i.e., the Dropbox user is different than the WordPress user). For this reason, Dropbox Sideload by default will log out the current Dropbox user after the selection is made. This way, another user on the same browser cannot access the files. If you would rather remain logged in, please change the appropriate setting.
 
 Changelog
 ---------
@@ -52,5 +52,5 @@ Changelog
 * 0.4 - Name change
 * 0.75 - New UI
 * 0.8 - Clean up UI. Add settings page.
-* 0.9 - Changed to a class object.
+* 0.9 - Changed to a class object. Minor UI updates.
 
