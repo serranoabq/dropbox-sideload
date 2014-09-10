@@ -52,4 +52,5 @@ Changelog
 * 0.4 - Name change
 * 0.75 - New UI
 * 0.8 - Clean up UI. Add settings page.
+* 0.9 - Changed to a class object.
 
