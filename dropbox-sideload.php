@@ -6,6 +6,9 @@
     Author: Justin R. Serrano
 */
 
+// No direct access
+if ( !defined( 'ABSPATH' ) ) exit;
+
 require_once( sprintf( "%s/dropbox-sideload-class.php", dirname(__FILE__) ) );
 
 if( class_exists( 'DropboxSideload' ) ) {
