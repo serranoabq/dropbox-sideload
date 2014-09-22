@@ -41,8 +41,8 @@ Sideloading depends heavily on the server capabilities. Some server configuratio
 Notes
 -------
 
-1. The API key allows Dropbox Sideload to use the Dropbox Chooser Drop-in to select the file. This retreives the download URL of the selected file in the same way one can share the file directly from Dropbox. The API key _DOES NOT_ provide access to any file within a Dropbox account other than the one selected by the user. 
-2. If a user is logged into the Dropbox site on the browser being used to access the WordPress site, that Dropbox account will automatically be used. Depending on the browsing environment, this can be a potential security issue with potential unauthorized access to Dropbox (i.e., the Dropbox user is different than the WordPress user). For this reason, Dropbox Sideload by default will log out the current Dropbox user after the selection is made. This way, another user on the same browser cannot access the files. If you would rather remain logged in, please change the appropriate setting.
+1. The API key allows Dropbox Sideload to use the Dropbox Chooser Drop-in to select the file. This retreives the download URL of the selected file in the same way one can share the file directly from Dropbox. The API key _DOES NOT_ provide access to any other file within a Dropbox account other than the one selected by the user. 
+2. If a user is logged into the Dropbox site on the browser being used to access the WordPress site, that Dropbox account will automatically be used for sideloading. Depending on the browsing environment (e.g., public computer), this can be a potential security issue with unauthorized access to Dropbox (i.e., the Dropbox user is different than the WordPress user). For this reason, Dropbox Sideload will automatically log out the current Dropbox user after the file selection is made. This way, another user on the same browser cannot access the files. If you would rather remain logged in, please change the appropriate setting.
 
 Changelog
 ---------
