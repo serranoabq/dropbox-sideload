@@ -37,4 +37,6 @@ tr.error td {
 	line-height: 1.5em;
 }
 
-
+#dropbox-file-desc {
+	width: 35em;
+}

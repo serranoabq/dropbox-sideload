@@ -140,6 +140,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 			
 			// Handle request parameters
 			$dropbox_file 			= isset( $_REQUEST['dropbox-file'] ) ? $_REQUEST['dropbox-file'] : '';
+			$dropbox_file_desc	= $_REQUEST['dropbox-file-desc'];
 			
 			// Get options
 			$dropbox_api = get_option( 'dropbox-api', '' );
@@ -162,7 +163,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 			
 			if( $step1 && ! empty( $dropbox_file ) ){
 				// Step 1 & 2 completed, so handle sideload
-				$attachment_url = $this->handle_sideload( $dropbox_file );
+				$attachment_url = $this->handle_sideload( $dropbox_file, $dropbox_file_desc );
 				
 				// If successful, point the user to the Media Library
 				if ($attachment_url){
@@ -198,6 +199,18 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 								</a>
 								<br/>
 								<span class="description"><?php _e( 'Choose a file from Dropbox and press Sideload', ' dropbox-sideload' ); ?> </span>
+								<br/>
+								
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<?php _e( 'File description', 'dropbox-sideload' ); ?>
+							</th>
+							<td>
+								<textarea name="dropbox-file-desc" id="dropbox-file-desc" class="regular-text"><?php echo $dropbox_file_desc; ?>"</textarea> 
+								<br/>
+								<span class="description"><?php _e( 'Enter a description for the file (Optional).' ); ?> </span>
 								<br/>
 								
 							</td>
@@ -298,13 +311,15 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 		}
 		
 		// Handle the sideloading. Returns attachment url on success, FALSE on failure
-		public function handle_sideload( $url ){
+		public function handle_sideload( $url, $desc ){
 			// Download file to temporary location
 			$tmp = download_url( $url );
+			
 			$file_array = array(
 				'name' => basename( $url ),
 				'tmp_name' => $tmp
 			);
+			
 			
 			// Check for download errors
 			if ( is_wp_error( $tmp ) ) {
@@ -315,7 +330,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 			}
 			
 			// Do the sideloading into WP
-			$id = media_handle_sideload( $file_array, 0);
+			$id = media_handle_sideload( $file_array, 0, $desc );
 			
 			// Check for handle sideload errors.
 			if ( is_wp_error( $id ) ) {
