@@ -40,3 +40,11 @@ tr.error td {
 #dropbox-file-desc {
 	width: 35em;
 }
+
+#dropbox-file-description td {
+	vertical-align: middle;
+}
+#dropbox-thumb {
+	width: 100px;
+}
+

@@ -161,6 +161,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 			// Step 1 is completed when the API setting is entered
 			$step1  = ! empty($dropbox_api);
 			
+			// Step2 is submitting a dropbox file
 			if( $step1 && ! empty( $dropbox_file ) ){
 				// Step 1 & 2 completed, so handle sideload
 				$attachment_url = $this->handle_sideload( $dropbox_file, $dropbox_file_desc );
@@ -170,7 +171,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 					$status = sprintf( __('The file was susccesfully sideloaded, go to the <a href="%s">Media Library</a> to add it to your post.', 'dropbox-sideload'), $library_url ) ;
 					$dropbox_file = ''; // clear the form
 				} else { 
-					$status = __('Error sideloading the file from Dropbox. <br/>', 'dropbox-sideload') . $this->get_last_error();
+					$status = __( 'Error sideloading the file from Dropbox. <br/>', 'dropbox-sideload' ) . $this->get_last_error();
 					$class .= ' error';
 				}
 			}
@@ -179,7 +180,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 			<div class="dropbox_sideload_wrap">
 				<?php if ( ! $step1 ) { ?>
 				<div class="error"><p>
-				<?php echo sprintf( __('No Dropbox API key specified. Please add one in the <a href="%s">Settings Page</a>','dropbox-sideload'), admin_url( 'options-general.php?page=dropbox-sideload' ) );?>
+				<?php echo sprintf( __( 'No Dropbox API key specified. Please add one in the <a href="%s">Settings Page</a>', 'dropbox-sideload' ), admin_url( 'options-general.php?page=dropbox-sideload' ) );?>
 				</p></div>
 				<?php } ?>
 				<form method="post" action="<?php echo $url ?>">
@@ -190,7 +191,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 					<tbody>
 						<tr>
 							<th scope="row">
-								<?php _e( 'Choose sideload file', 'dropbox-sideload' ); ?>
+								<?php _e( 'File', 'dropbox-sideload' ); ?>
 							</th>
 							<td>
 								<input type="text" name="dropbox-file" id="dropbox-file" class="regular-text" value="<?php echo $dropbox_file; ?>" readonly /> 
@@ -198,7 +199,7 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 									<?php _e( 'Choose from Dropbox', 'dropbox-sideload' ); ?>
 								</a>
 								<br/>
-								<span class="description"><?php _e( 'Choose a file from Dropbox and press Sideload', ' dropbox-sideload' ); ?> </span>
+								<span class="description"><?php _e( 'Press the button to choose a file from Dropbox', ' dropbox-sideload' ); ?> </span>
 								<br/>
 								
 							</td>
@@ -220,10 +221,12 @@ if ( ! class_exists( 'DropboxSideload' ) ) {
 								<?php _e( 'Sideload stauts', 'dropbox-sideload' ); ?>
 							</th>
 							<td>
-								<div id="dropbox-file-description">
-									<div id="dropbox-filename"></div>
-									<div id="dropbox-thumb"></div>
-								</div>
+								<table id="dropbox-file-description">
+									<tr>
+										<td id="dropbox-thumb"></td>
+										<td id="dropbox-fileinfo"></td>
+									</tr>
+								</table>
 								<div id="dropbox-status"><?php echo $status; ?></div>
 							</td>
 						</tr>

@@ -19,13 +19,18 @@ jQuery(document).ready(function (){
 					// Add file to text box
 					jQuery('#dropbox-file').val(files[0].link);
 					jQuery('#dropbox-sideload-button').removeAttr('disabled');
-					jQuery('#dropbox-filename').html( files[0].name);
-					$img = files[0].icon;
+					
+					// Populate the file info box
+					img = files[0].icon;
 					if ( files[0].thumbnailLink ) {
-						$img = files[0].thumbnailLink;
+						img = files[0].thumbnailLink;
 					}
-					jQuery('#dropbox-thumb').html( '<img src="' + $img + '" />');
-					jQuery('#dropbox-status').html( 'Ready to sideload');
+					jQuery('#dropbox-thumb').html( '<img src="' + img + '" />');
+					jQuery('#dropbox-fileinfo').html( 
+						'<strong>File: </strong>' + files[0].name + '</br>' +
+						'<strong>Size: </strong>' + Math.floor( files[0].bytes/1024 ) + ' kB'
+					);
+					jQuery('#dropbox-status').html( '<strong>Status:</strong> Ready to sideload' );
 						
 					// This is a little 'hackish', but it works at logging out the user
 					if( jQuery('#dropbox-stay-logged-in').prop('value') == '0' )
